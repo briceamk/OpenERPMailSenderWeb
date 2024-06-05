@@ -1,0 +1,6 @@
+<ng-container *ngIf="(sizes$ | async) as sizes">
+  <select (change)="onSize($event)" class="form-select" aria-label="Default select example">
+    <option *ngFor="let size of sizes" value="{{size}}">{{ size }}</option>
+  </select>
+
+</ng-container>

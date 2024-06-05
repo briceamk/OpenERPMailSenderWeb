@@ -1,0 +1,165 @@
+<ng-container *ngIf="mailState$ | async as state" [ngSwitch]="state.dataState">
+  <ng-container *ngIf="{value: unlockForm$ | async} as unlockForm">
+    <div class="container-fluid">
+
+      <div class="container">
+        <form #mailForm="ngForm" (ngSubmit)="updateMail(mailForm)">
+          <input type="hidden" id="id" name="id" [ngModel] = "state?.data?.id">
+          <input type="hidden" id="type" name="type" [ngModel] = "state?.data?.type">
+          <input type="hidden" id="externalServerId" name="externalServerId" [ngModel] = "state?.data?.externalServerId">
+          <input type="hidden" id="externalId" name="externalId" [ngModel] = "state?.data?.externalId">
+          <input type="hidden" id="sendAt" name="sendAt" [ngModel] = "state?.data?.sendAt">
+          <input type="hidden" id="instanceId" name="instanceId" [ngModel] = "state?.data?.instanceId">
+          <input type="hidden" id="mailTemplate" name="mailTemplate" [ngModel] = "state?.data?.mailTemplate">
+          <!-- Title -->
+          <div class="d-flex justify-content-between align-items-lg-center py-3 flex-column flex-lg-row">
+            <h2 class="h5 mb-3 mb-lg-0"><a [routerLink]="['/mails']" class="text-muted"><i class="fa fa-backward me-2"></i></a> Liste des Mails</h2>
+            <div class="hstack gap-3">
+
+              <button type="button" (click)="editMail()" class="btn btn-primary btn-sm btn-icon-text"
+                      *ngIf="!unlockForm.value && ['DRAFT', 'SENDING', 'ERROR'].includes(state?.data.state.valueOf()) && state?.data.type.valueOf() === 'NOT_APPLICABLE'" >
+                <i class="fa fa-edit"></i> <span class="text"> Modifier</span>
+              </button>
+              <button type="submit" class="btn btn-success btn-sm btn-icon-text" *ngIf="unlockForm.value"
+                      [disabled]="mailForm.invalid || mailForm.pristine || state.dataState === DataStateEnum.Loading">
+                <span class="text" *ngIf="state.dataState === DataStateEnum.Loading"><i class="fa fa-spinner fa-spin" ></i> Chargement...</span>
+                <span class="text" *ngIf="!(state.dataState === DataStateEnum.Loading)"><i class="fa fa-save"></i>  Enregistrer</span>
+              </button>
+              <button type="button" (click)="cancelEditMail(mailForm)" class="btn btn-secondary btn-sm btn-icon-text"
+                      *ngIf="unlockForm.value"
+                      [disabled]="state.dataState === DataStateEnum.Loading">
+                <span class="text"><i class="fa fa-close"></i>  Annuler</span>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="state.dataState === DataStateEnum.Error && state.reason" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            {{ state.reason}}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <div *ngIf="state.dataState === DataStateEnum.Loaded && state.message" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            {{ state.message}}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+
+          <!-- Main content -->
+          <div class="row">
+            <!-- Left side -->
+            <div class="col-lg-8">
+              <!-- Basic information -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h3 class="h6 mb-4">Configuration de l'instance</h3>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="mb-3">
+                        <label for="to" class="form-label"><small>Destinataire</small></label>
+                        <input type="text" class="form-control" name="to" id="to" [ngModel] = "state?.data.to" required [disabled]="(state.dataState === DataStateEnum.Loading) || !unlockForm.value">
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'to'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="mb-3">
+                        <label for="subject" class="form-label"><small>Objet</small></label>
+                        <input type="text" class="form-control" name="subject" id="subject" [ngModel] = "state?.data.subject" required [disabled]="(state.dataState === DataStateEnum.Loading) || !unlockForm.value">
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'subject'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="mb-3">
+                        <label for="createdAt" class="form-label"><small>Envoyé à</small></label>
+                        <input type="text" class="form-control" name="createdAt" id="createdAt" [ngModel] = "state?.data.createdAt" required [disabled]="(state.dataState === DataStateEnum.Loading) || !unlockForm.value">
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'createdAt'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="mb-3">
+                        <label for="attemptToSend" class="form-label"><small>Nombre de tentative d'envoie</small></label>
+                        <input type="number" class="form-control" name="attemptToSend"  id="attemptToSend" [ngModel] = "state?.data.attemptToSend" required [disabled]="(state.dataState === DataStateEnum.Loading) || !unlockForm.value">
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'attemptToSend'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Right side -->
+            <div class="col-lg-4">
+              <!-- Status -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h3 class="h6 mb-4">Configuration de l'instance</h3>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="mb-3">
+                        <ng-container *ngIf="mailServersSubject.asObservable() | async as mailServers">
+                          <label for="mailServer" class="form-label"><small>Serveur Mail</small></label>
+                          <select class="form-select"  name="mailServer" id="mailServer" [ngModel] = "state?.data.mailServer" required [disabled]="(state.dataState === DataStateEnum.Loading) || !unlockForm.value">
+                            <option *ngFor="let mailServer of mailServers" value="{{mailServer}}">{{ mailServer.name }}</option>
+                          </select>
+                        </ng-container>
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'mailServer'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-12">
+                      <div class="mb-3">
+                        <label for="state" class="form-label"><small>Status</small></label>
+                        <select class="form-select" name="state" id="state"   [ngModel]="state?.data?.state" [disabled]="state.dataState === DataStateEnum.Loading  || !unlockForm.value">
+                          <option ngValue value="DRAFT">Nouveau</option>
+                          <option ngValue value="SENDING">En cours d'envoie</option>
+                          <option ngValue value="SEND">Envoyé</option>
+                          <option ngValue value="ERROR">Erreur</option>
+                          <option ngValue value="COMPLETE">Terminé</option>
+                        </select>
+                        <div class="text-start" *ngFor="let error of state.error">
+                          <small *ngIf="error.field === 'state'" class="text-danger">{{ error.message }}</small>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <!-- Status -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h3 class="h6 mb-4">Contenu du mail</h3>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="mb-3">
+                        <div class="form-floating">
+                          <textarea class="form-control" style="height: 400px" placeholder="message" id="message" name="message" [ngModel]="state?.data?.message" [disabled]="state.dataState === DataStateEnum.Loading  || !unlockForm.value"></textarea>
+                          <label for="message">Message</label>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </ng-container>
+</ng-container>
+
+

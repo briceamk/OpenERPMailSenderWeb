@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/open-erpemail-sender-web",
+            "outputPath": "dist/openerpemailsender-web",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -25,9 +25,13 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/font-awesome/css/font-awesome.min.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -45,10 +49,27 @@
               ],
               "outputHashing": "all"
             },
+            "integration": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.production.ts",
+                  "with": "src/environments/environment.integration.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.production.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -59,8 +80,12 @@
             "production": {
               "buildTarget": "OpenERPEmailSenderWeb:build:production"
             },
+            "integration": {
+              "buildTarget": "OpenERPEmailSenderWeb:build:integration"
+            },
             "development": {
               "buildTarget": "OpenERPEmailSenderWeb:build:development"
+
             }
           },
           "defaultConfiguration": "development"

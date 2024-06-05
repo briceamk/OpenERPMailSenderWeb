@@ -1,0 +1,88 @@
+<section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
+
+  <div class="container" *ngIf="!state.loginSuccess && !state.useMfa">
+    <div class="login-page-container">
+      <div class="text-center mb-4">
+        <app-logo></app-logo>
+      </div>
+      <div class="mx-4 text-center">
+        <h5>Se connecter</h5>
+      </div>
+      <div *ngIf="state.dataState === PageEnum.Error && state.reason" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        {{ state.reason}}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div *ngIf="state.dataState === PageEnum.Loaded && state.message" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        {{ state.message}}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
+        <div class="mb-3">
+          <label for="email" class="form-label">Username</label>
+          <input type="text" [disabled]="state.dataState === PageEnum.Loading" ngModel class="form-control" id="email" name="email" placeholder="Enter your username">
+          <div class="text-start" *ngFor="let error of state.error">
+            <small *ngIf="error.field === 'email'" class="text-danger">{{ error.message }}</small>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" [disabled]="state.dataState === PageEnum.Loading" ngModel class="form-control" id="password" name="password" placeholder="Enter your password">
+          <div class="text-start" *ngFor="let error of state.error">
+            <small *ngIf="error.field === 'password'" class="text-danger">{{ error.message }}</small>
+          </div>
+        </div>
+        <div class="mb-3">
+          <button [disabled]="loginForm.invalid || loginForm.pristine || state.dataState === PageEnum.Loading" type="submit" class="btn btn-success w-100">
+            <span *ngIf="state.dataState === PageEnum.Loading"><i class="fa fa-spinner fa-spin"></i> Chargement...</span>
+            <span *ngIf="!(state.dataState === PageEnum.Loading)"><i class="fa fa-sign-in"></i> Se connecter</span>
+          </button>
+        </div>
+        <div class="mt-3 text-center">
+          <button type="button" routerLink="/register" class="btn btn-link text-decoration-none"><small>Crée un compte</small></button> |
+          <button type="button" routerLink="/reset-password" class="btn btn-link text-decoration-none"><small>Mot de passe oublié?</small></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="container" *ngIf="state.useMfa">
+    <div class="login-page-container">
+      <app-logo></app-logo>
+      <div class="mx-4 text-center">
+        <h5>Saisir le code reçu par e-mail</h5>
+      </div>
+      <div class="text-start mb-4 text-secondary">
+        <p>Un code a 6 caractères vous a été envoyé à axxxxxxxxjigmail.com. Veuillez consulter votre boite mail et saisir le code.</p>
+      </div>
+      <div *ngIf="state.dataState === PageEnum.Error && state.reason" class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        {{ state.reason}}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <div *ngIf="state.dataState === PageEnum.Loaded && state.message" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        {{ state.message}}
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      <form #verifyCodeForm="ngForm" (ngSubmit)="verifyCode(verifyCodeForm)">
+        <div class="mb-3">
+          <label for="code" class="form-label">Code</label>
+          <input type="text" [disabled]="state.dataState === PageEnum.Loading" ngModel class="form-control" id="code" name="code" placeholder="Entrer le code a 6 caractères.">
+          <div class="text-start" *ngFor="let error of state.error">
+            <small *ngIf="error.field === 'code'" class="text-danger">{{ error.message }}</small>
+          </div>
+        </div>
+        <div class="mb-3">
+          <button [disabled]="verifyCodeForm.invalid || verifyCodeForm.pristine || state.dataState === PageEnum.Loading" type="submit" class="btn btn-success w-100">
+            <span *ngIf="(state.dataState === PageEnum.Loading)"><i class="fa fa-spinner fa-spin"></i> Chargement...</span>
+            <span *ngIf="!(state.dataState === PageEnum.Loading)"><i class="fa fa-checkc"></i> Valider</span>
+          </button>
+        </div>
+        <div class="mt-3 text-center">
+          <button type="button" (click)="resendCode()" [disabled]="state.dataState === PageEnum.Loading"  class="btn btn-link text-decoration-none"><small>Renvoyer le code</small></button> |
+          <button type="button" (click)="loginAgain()" [disabled]="state.dataState === PageEnum.Loading"  class="btn btn-link text-decoration-none"><small>Se reconnecter?</small></button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</section>

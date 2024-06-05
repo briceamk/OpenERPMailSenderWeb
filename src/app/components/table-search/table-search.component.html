@@ -1,0 +1,4 @@
+<div class="input-group" *ngIf="search$ | async as search">
+  <input type="text" [formControl]="search" name="filter" class="form-control" placeholder="Rechercher">
+  <button  class="btn btn-success" type="submit"><i class="fa fa-eraser"></i> </button>
+</div>

@@ -1,0 +1,19 @@
+<ng-container *ngIf="activateAccountState$ | async as state">
+  <div class="activate-account-container">
+    <app-logo></app-logo>
+    <div class="row">
+      <div class="col-md-12 error-container">
+        <ng-container *ngIf="state.dataState === DataStateEnum.Loaded && state.message">
+          <h1 class="activate-account-title text-success" >Félicitation!</h1>
+          <p class="activate-account-message" >{{state.message}}</p>
+          <a routerLink="/login" class="btn btn-outline-success mt-3 mr-3"><i class="fa fa-backward"></i> Se connecter</a>
+        </ng-container>
+        <ng-container *ngIf="state.dataState === DataStateEnum.Error && state.error">
+          <h1 class="activate-account-title text-danger" >Désolé!</h1>
+          <p class="activate-account-message" >{{state.reason}}</p>
+          <a routerLink="/login" class="btn btn-outline-success mt-3"><i class="fa fa-backward"></i> Demander un nouveau Lien</a>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</ng-container>

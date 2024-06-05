@@ -1,0 +1,53 @@
+
+  <!-- Partie haute -->
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table" >
+        <thead>
+        <tr>
+          <th scope="col"><input type="checkbox"></th>
+          <ng-container *ngIf="(headers$ | async) as headers">
+            <th scope="col" *ngFor="let header of headers">
+              <ng-container *ngIf="(sortDirection$ | async) as direction">
+                <ng-container *ngIf="(sortAttribute$ | async) as attribute">
+              <a style="cursor: pointer" (click)="onSort({attribute: header.name, direction:direction})" class="text-decoration-none text-black">
+                <small>{{ header.label }}</small>
+                <i *ngIf="attribute === header.name" [ngClass]="direction=== DirectionEnum.ASC? 'fa fa-arrow-up': 'fa fa-arrow-down'"></i>
+              </a>
+                </ng-container>
+              </ng-container>
+            </th>
+          </ng-container>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-container *ngIf="(rows$ | async) as rows">
+          <ng-container *ngIf="(headers$ | async) as headers">
+            <tr *ngFor="let row of rows">
+              <td><input type="checkbox"></td>
+              <td *ngFor="let header of headers">
+                <span *ngIf="header.name !== 'mailServer' && header.name !== 'createdAt' && header.name !== 'state'">{{  row[header.name] }}</span>
+                <span *ngIf="header.name === 'mailServer'">{{  row[header.name] | mailServer:'name'}}</span>
+                <span *ngIf="header.name === 'createdAt'">{{  row[header.name] | date:"dd/MM/yyyy hh:mm:ss"}}</span>
+                <span *ngIf="header.name === 'state'">
+                  <span *ngIf="['ACTIVE', 'SEND', 'CONFIRM', 'COMPLETE'].includes(row[header.name])" class="badge bg-success">{{  row[header.name] }}</span>
+                  <span *ngIf="['INACTIVE', 'ERROR'].includes(row[header.name])" class="badge bg-danger">{{  row[header.name] }}</span>
+                  <span *ngIf="['SENDING', 'WAITING'].includes(row[header.name])" class="badge bg-warning">{{  row[header.name] }}</span>
+                  <span *ngIf="['NEW', 'DRAFT'].includes(row[header.name])" class="badge bg-primary">{{  row[header.name] }}</span>
+                </span>
+              </td>
+              <td>
+                <ng-container *ngIf="{value: showEdit$ | async } as showEdit">
+                  <a *ngIf="showEdit.value"  (click)="onEdit(row)" style="cursor: pointer" class="btn text-success btn-link mr-2" title="Modifier"><i class="fa fa-edit"></i></a>
+                </ng-container>
+                <a (click)="onDelete(row)" style="cursor: pointer" class="btn text-danger btn-link" title="Supprimer"><i class="fa fa-trash"></i></a>
+              </td>
+            <tr>
+          </ng-container>
+        </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+

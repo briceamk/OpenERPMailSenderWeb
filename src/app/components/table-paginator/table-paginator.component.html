@@ -1,0 +1,45 @@
+<ng-container *ngIf="pageInfo$ | async as pageInfo">
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-end">
+      <ng-container *ngIf="(showFirst$ | async) as showFirst">
+        <li class="page-item" *ngIf="showFirst" [ngClass]="pageInfo.first? 'disabled':''">
+          <a class="page-link" (click)="onPage(0)"><i class="fa fa-angle-double-left"></i></a>
+        </li>
+      </ng-container>
+
+      <ng-container *ngIf="{value: currentPage$ | async} as currentPage">
+        <li class="page-item" [ngClass]="pageInfo.first? 'disabled':''">
+          <a class="page-link"  (click)="onPage(currentPage.value - 1)"><i class="fa fa-angle-left"></i></a>
+        </li>
+      </ng-container>
+
+
+
+          <!--<ng-container *ngFor="let item of [].constructor(pageInfo.totalPages); let i = index">
+            <ng-container *ngIf="{value: currentPage$ | async} as currentPage">
+              <li class="page-item" [ngClass]="currentPage.value === i? 'active': ''">
+                <a class="btn page-link" (click)="onPage(i)">{{ i + 1}}</a>
+              </li>
+            </ng-container>
+          </ng-container>-->
+      <ng-container *ngIf="{value: currentPage$ | async} as currentPage">
+          <p class="my-auto mx-2 align-items-center">
+            {{ pageInfo.first? 1 : 1 + (pageInfo.pageSize * (currentPage.value ))}} - {{ pageInfo.last? pageInfo.totalElements : (currentPage.value + 1) * pageInfo.pageSize}} sur {{pageInfo.totalElements}}</p>
+      </ng-container>
+
+
+      <ng-container *ngIf="{value: currentPage$ | async} as currentPage">
+        <li class="page-item" [ngClass]="pageInfo.last? 'disabled':''">
+          <a class="page-link" (click)="onPage(currentPage.value + 1)"><i class="fa fa-angle-right"></i></a>
+        </li>
+      </ng-container>
+
+      <ng-container *ngIf="(showLast$ | async) as showLast">
+        <li class="page-item" *ngIf="showLast"  [ngClass]="pageInfo.last? 'disabled':''">
+          <a class="page-link" (click)="onPage(pageInfo.totalPages - 1)"><i class="fa fa-angle-double-right"></i></a>
+        </li>
+      </ng-container>
+    </ul>
+  </nav>
+</ng-container>
+

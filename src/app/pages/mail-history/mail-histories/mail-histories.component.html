@@ -1,0 +1,44 @@
+<section *ngIf="(mailHistoriesState$ | async) as state">
+  <div class="container">
+    <div class="row mt-3 mb-3">
+      <div class="col-md-12"><h2>Historique des mails</h2></div>
+      <div class="col-md-6">
+        <!--Remove Create New Button component-->
+      </div>
+      <div class="col-md-6">
+        <app-table-search
+          [search$]="currentSearchSubject.asObservable()"
+          (clear)="onClear()"
+        >
+        </app-table-search>
+      </div>
+    </div>
+    <app-table
+      [headers$]="headersSubject.asObservable()"
+      [rows$]="of(transform(state?.data?.data))"
+      [sortDirection$]="currentDirectionSubject.asObservable()"
+      [sortAttribute$]="currentAttributeSubject.asObservable()"
+      [showEdit$]="of(false)"
+      (edit)="onEdit($event)"
+      (delete)="onDelete($event)"
+      (sort)="onSort($event)"
+    ></app-table>
+    <div class="row">
+      <div class="col-md-2">
+        <app-table-size
+          [sizes$]="sizesSubject.asObservable()"
+          (size)="onSize($event)"
+        ></app-table-size>
+      </div>
+      <div class="col-md-10">
+        <app-table-paginator
+          [pageInfo$]="of(state?.data?.pageInfo)"
+          [currentPage$]="currentPageSubject.asObservable()"
+          [showFirst$]="of(true)"
+          [showLast$]="of(true)"
+          (page)="onPage($event)"
+        ></app-table-paginator>
+      </div>
+    </div>
+  </div>
+</section>
